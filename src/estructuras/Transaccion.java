@@ -7,9 +7,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.Arrays;
 import java.util.Date;
 
-
 public class Transaccion {
-    
+
     // Hash de la transacción e identificador único de ésta
     private byte[] hash;
 
@@ -22,10 +21,12 @@ public class Transaccion {
     // Valor a ser transferido
     private double cantidad;
 
-    // Firma con la clave privada para verificar que la transacción fue realmente enviada por el emisor
+    // Firma con la clave privada para verificar que la transacción fue realmente
+    // enviada por el emisor
     private byte[] firma;
 
-    // Marca temporal de la creación de la transacción en milisegundos desde el 1/1/1970
+    // Marca temporal de la creación de la transacción en milisegundos desde el
+    // 1/1/1970
     private long marcaTemporal;
 
     public Transaccion() {
@@ -89,35 +90,62 @@ public class Transaccion {
     }
 
     /**
-     * El contenido de la transaccion que es firmado por el emisor con su clave privada
+     * El contenido de la transaccion que es firmado por el emisor con su clave
+     * privada
+     * 
      * @return byte[] Array de bytes representando el contenido de la transaccion
      */
     public byte[] getContenidoTransaccion() {
-        //Adds all the elements of the given arrays into a new array.
-    	byte[] contenido = ArrayUtils.addAll(String.valueOf(cantidad).getBytes());
-    	contenido = ArrayUtils.addAll(contenido, emisor);
-    	contenido = ArrayUtils.addAll(contenido, destinatario);
-    	contenido = ArrayUtils.addAll(contenido, firma);
-    	contenido = ArrayUtils.addAll(contenido, Longs.toByteArray(marcaTemporal));        
+        // Adds all the elements of the given arrays into a new array.
+        byte[] contenido = ArrayUtils.addAll(String.valueOf(cantidad).getBytes());
+        contenido = ArrayUtils.addAll(contenido, emisor);
+        contenido = ArrayUtils.addAll(contenido, destinatario);
+        contenido = ArrayUtils.addAll(contenido, firma);
+        contenido = ArrayUtils.addAll(contenido, Longs.toByteArray(marcaTemporal));
         return contenido;
     }
 
     /**
-     * Calcular el hash del contenido de la transacción (identificador de la transacción)
+     * Calcular el hash del contenido de la transacción (identificador de la
+     * transacción)
+     * 
      * @return Hash SHA256
      */
     public byte[] calcularHashTransaccion() {
         return DigestUtils.sha256(getContenidoTransaccion());
     }
 
+    /**
+     * Comprobar si una transacción es válida
+     * 
+     * @return true si tiene un hash válido y la firma es válida
+     */
+    public boolean esValida() {
+        // verificar hash
+        if (!Arrays.equals(getHash(), calcularHashTransaccion())) {
+            return false;
+        }
+
+        // verificar firma
+        try {
+            if (!UtilidadesFirma.validarFirma(getContenidoTransaccion(), getFirma(), emisor)) {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if (this == obj){
+        if (this == obj) {
             return true;
-        } 
-        if (obj == null || getClass() != obj.getClass()){
-            return false;  
-        } 
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
 
         Transaccion tran = (Transaccion) obj;
 
@@ -131,7 +159,8 @@ public class Transaccion {
 
     @Override
     public String toString() {
-        return "{" + hash + ", " + emisor + ", " + destinatario + ", " + cantidad + ", " + firma + ", " + new Date(marcaTemporal) + "}";
+        return "{" + hash + ", " + emisor + ", " + destinatario + ", " + cantidad + ", " + firma + ", "
+                + new Date(marcaTemporal) + "}";
     }
 
 }
