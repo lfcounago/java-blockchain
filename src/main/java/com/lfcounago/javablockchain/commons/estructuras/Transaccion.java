@@ -94,10 +94,10 @@ public class Transaccion {
     }
 
     /**
-     * El contenido de la transaccion que es firmado por el emisor con su clave
-     * privada
-     * 
-     * @return byte[] Array de bytes representando el contenido de la transaccion
+     * Este método se utiliza para obtener el contenido de la transacción como un
+     * array de bytes.
+     *
+     * @return El contenido de la transacción como un array de bytes.
      */
     public byte[] getContenidoTransaccion() {
         byte[] contenido = ArrayUtils.addAll(String.valueOf(cantidad).getBytes());
@@ -108,19 +108,20 @@ public class Transaccion {
     }
 
     /**
-     * Calcular el hash del contenido de la transacción (identificador de la
-     * transacción)
-     * 
-     * @return Hash SHA256
+     * Este método se utiliza para calcular el hash SHA256 del contenido de la
+     * transacción.
+     *
+     * @return El hash SHA256 del contenido de la transacción.
      */
     public byte[] calcularHashTransaccion() {
         return DigestUtils.sha256(getContenidoTransaccion());
     }
 
     /**
-     * Comprobar si una transacción es válida
-     * 
-     * @return true si tiene un hash válido y la firma es válida
+     * Este método se utiliza para verificar si una transacción es válida.
+     * Una transacción es válida si tiene un hash válido y la firma es válida.
+     *
+     * @return true si la transacción es válida, false en caso contrario.
      */
     public boolean esValida() {
 
@@ -143,6 +144,13 @@ public class Transaccion {
         return true;
     }
 
+    /**
+     * Compara esta transacción con el objeto especificado.
+     *
+     * @param o el objeto con el que se debe comparar esta transacción.
+     * @return true si este objeto es el mismo que el objeto argumento; false en
+     *         caso contrario.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -155,11 +163,21 @@ public class Transaccion {
         return Arrays.equals(hash, tr.hash);
     }
 
+    /**
+     * Devuelve un valor hash para esta transacción.
+     *
+     * @return un valor hash para este objeto.
+     */
     @Override
     public int hashCode() {
         return Arrays.hashCode(hash);
     }
 
+    /**
+     * Devuelve una representación de cadena de esta transacción.
+     *
+     * @return una representación de cadena de esta transacción.
+     */
     @Override
     public String toString() {
         return "{" + Base64.encodeBase64String(hash) + ", " + Base64.encodeBase64String(emisor) + ", "

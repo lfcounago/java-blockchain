@@ -31,11 +31,10 @@ public class CadenaDeBloques {
 	}
 
 	/**
-	 * Devuelve el bloque con el hash dado
-	 * 
-	 * @param hash
-	 * 
-	 * @return último bloque de la cadena
+	 * Este método se utiliza para obtener el último bloque de la cadena de bloques.
+	 *
+	 * @return El último bloque de la cadena de bloques, o null si la cadena de
+	 *         bloques está vacía.
 	 */
 	public Bloque getUltimoBloque() {
 		if (estaVacia()) {
@@ -44,10 +43,22 @@ public class CadenaDeBloques {
 		return this.bloques.get(this.bloques.size() - 1);
 	}
 
+	/**
+	 * Este método se utiliza para añadir un bloque a la cadena de bloques.
+	 *
+	 * @param bloque El bloque que se va a añadir a la cadena de bloques.
+	 */
 	public void añadirBloque(Bloque bloque) {
 		this.bloques.add(bloque);
 	}
 
+	/**
+	 * Compara esta cadena de bloques con el objeto especificado.
+	 *
+	 * @param o el objeto con el que se debe comparar esta cadena de bloques.
+	 * @return true si este objeto es el mismo que el objeto argumento; false en
+	 *         caso contrario.
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
@@ -68,6 +79,11 @@ public class CadenaDeBloques {
 		return true;
 	}
 
+	/**
+	 * Devuelve una representación de cadena de esta cadena de bloques.
+	 *
+	 * @return una representación de cadena de esta cadena de bloques.
+	 */
 	@Override
 	public String toString() {
 		return bloques.toString();

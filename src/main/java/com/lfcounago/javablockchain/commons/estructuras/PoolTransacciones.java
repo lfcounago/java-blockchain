@@ -18,9 +18,11 @@ public class PoolTransacciones {
     }
 
     /**
-     * Añadir una transaccion al pool
-     * 
-     * @return true si la transaccion es válida y es añadida al pool
+     * Añade una transacción al pool de transacciones si es válida.
+     *
+     * @param transaccion La transacción que se va a añadir al pool.
+     * @return true si la transacción es válida y se ha añadido al pool, false en
+     *         caso contrario.
      */
     public synchronized boolean añadirTransaccion(Transaccion transaccion) {
         if (transaccion.esValida()) {
@@ -31,17 +33,21 @@ public class PoolTransacciones {
     }
 
     /**
-     * Eliminar una transaccion del pool
+     * Elimina una transacción del pool de transacciones.
+     *
+     * @param transaccion La transacción que se va a eliminar del pool.
      */
     public void eliminarTransaccion(Transaccion transaccion) {
         pool.remove(transaccion);
     }
 
     /**
-     * Comprobar si el pool contiene todas las transacciones de una lista de
-     * transacciones
-     * 
-     * @return true si todas las transacciones de la coleccion están en el pool
+     * Comprueba si el pool de transacciones contiene todas las transacciones de una
+     * colección dada.
+     *
+     * @param transacciones La colección de transacciones que se va a comprobar.
+     * @return true si todas las transacciones de la colección están en el pool,
+     *         false en caso contrario.
      */
     public boolean contieneTransacciones(Collection<Transaccion> transacciones) {
         return pool.containsAll(transacciones);

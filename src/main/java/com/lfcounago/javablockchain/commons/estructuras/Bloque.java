@@ -159,6 +159,13 @@ public class Bloque {
 		return true;
 	}
 
+	/**
+	 * Compara este bloque con el objeto especificado.a
+	 *
+	 * @param o el objeto con el que se debe comparar este bloque.
+	 * @return true si este objeto es el mismo que el objeto argumento; false en
+	 *         caso contrario.
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
@@ -171,11 +178,21 @@ public class Bloque {
 		return Arrays.equals(hash, bloque.hash);
 	}
 
+	/**
+	 * Devuelve un valor hash para este bloque.
+	 *
+	 * @return un valor hash para este objeto.
+	 */
 	@Override
 	public int hashCode() {
 		return Arrays.hashCode(hash);
 	}
 
+	/**
+	 * Devuelve una representación de cadena de este bloque.
+	 *
+	 * @return una representación de cadena de este bloque.
+	 */
 	@Override
 	public String toString() {
 		return "{Hash:" + Base64.encodeBase64String(hash) + ", Previo:" + Base64.encodeBase64String(hashBloqueAnterior)
