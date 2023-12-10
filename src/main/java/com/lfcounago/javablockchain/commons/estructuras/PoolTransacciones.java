@@ -1,4 +1,4 @@
-package estructuras;
+package com.lfcounago.javablockchain.commons.estructuras;
 
 import java.util.Collection;
 import java.util.HashSet;

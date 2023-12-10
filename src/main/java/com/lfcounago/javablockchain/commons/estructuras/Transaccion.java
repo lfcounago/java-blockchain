@@ -1,6 +1,9 @@
-package estructuras;
+package com.lfcounago.javablockchain.commons.estructuras;
 
 import com.google.common.primitives.Longs;
+
+import com.lfcounago.javablockchain.commons.utilidades.UtilidadesFirma;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 

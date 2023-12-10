@@ -1,4 +1,4 @@
-package estructuras;
+package com.lfcounago.javablockchain.commons.estructuras;
 
 import com.google.common.primitives.Longs;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -12,7 +12,7 @@ import java.util.Queue;
 import java.util.stream.Collectors;
 
 public class Bloque {
-    // Hash del bloque e identificador único de éste. Usado para enlazar bloques.
+	// Hash del bloque e identificador único de éste. Usado para enlazar bloques.
 	private byte[] hash;
 
 	// Hash del bloque anterior.
@@ -24,7 +24,8 @@ public class Bloque {
 	// Marca temporal de creación del bloque
 	private long marcaTemporal;
 
-	// Root del arbol de merkle calculado a partir de las transacciones en el bloque.
+	// Root del arbol de merkle calculado a partir de las transacciones en el
+	// bloque.
 	private byte[] raizArbolMerkle;
 
 	// Lista de transacciones incluidas en este bloque
@@ -91,7 +92,8 @@ public class Bloque {
 	}
 
 	/**
-	 * Calcular el hash del bloque a partir de la información de la cabecera del bloque (sin transacciones)
+	 * Calcular el hash del bloque a partir de la información de la cabecera del
+	 * bloque (sin transacciones)
 	 * 
 	 * @return Hash SHA256
 	 */
@@ -151,8 +153,10 @@ public class Bloque {
 		return Arrays.hashCode(hash);
 	}
 
-    @Override
-    public String toString() {
-        return "{Hash:" + hash + ", Previo:" + hashBloqueAnterior + ", RaizMerkle:" + raizArbolMerkle + ", Nonce:" + nonce + ", marcaTemporal:" + new Date(marcaTemporal) + ", Transacciones:" + transacciones.toString() + "}";
-    }
+	@Override
+	public String toString() {
+		return "{Hash:" + hash + ", Previo:" + hashBloqueAnterior + ", RaizMerkle:" + raizArbolMerkle + ", Nonce:"
+				+ nonce + ", marcaTemporal:" + new Date(marcaTemporal) + ", Transacciones:" + transacciones.toString()
+				+ "}";
+	}
 }
