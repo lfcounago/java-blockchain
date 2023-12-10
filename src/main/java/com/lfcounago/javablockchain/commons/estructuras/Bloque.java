@@ -1,6 +1,8 @@
 package com.lfcounago.javablockchain.commons.estructuras;
 
 import com.google.common.primitives.Longs;
+
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -22,7 +24,7 @@ public class Bloque {
 	private long nonce;
 
 	// Marca temporal de creación del bloque
-	private long marcaTemporal;
+	private long timestamp;
 
 	// Root del arbol de merkle calculado a partir de las transacciones en el
 	// bloque.
@@ -38,7 +40,7 @@ public class Bloque {
 		this.hashBloqueAnterior = hashBloqueAnterior;
 		this.transacciones = transacciones;
 		this.nonce = nonce;
-		this.marcaTemporal = System.currentTimeMillis();
+		this.timestamp = System.currentTimeMillis();
 		this.raizArbolMerkle = calcularRaizArbolMerkle();
 		this.hash = calcularHash();
 	}
@@ -83,12 +85,12 @@ public class Bloque {
 		this.nonce = nonce;
 	}
 
-	public long getMarcaTemporal() {
-		return marcaTemporal;
+	public long getTimestamp() {
+		return timestamp;
 	}
 
-	public void setMarcaTemporal(long marcaTemporal) {
-		this.marcaTemporal = marcaTemporal;
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	/**
@@ -100,7 +102,7 @@ public class Bloque {
 	public byte[] calcularHash() {
 		byte[] hashableData = ArrayUtils.addAll(hashBloqueAnterior, raizArbolMerkle);
 		hashableData = ArrayUtils.addAll(hashableData, Longs.toByteArray(nonce));
-		hashableData = ArrayUtils.addAll(hashableData, Longs.toByteArray(marcaTemporal));
+		hashableData = ArrayUtils.addAll(hashableData, Longs.toByteArray(timestamp));
 		return DigestUtils.sha256(hashableData);
 	}
 
@@ -136,14 +138,35 @@ public class Bloque {
 		return getHash().length;
 	}
 
+	/**
+	 * Comprobar si el bloque es válido
+	 * 
+	 * @return true si el bloque es válido
+	 */
+	public boolean esValido() {
+		// la raiz del arbol de Merkle coincide
+		if (!Arrays.equals(getRaizArbolMerkle(), calcularRaizArbolMerkle())) {
+			System.out.println("Raiz Merkle inválida");
+			return false;
+		}
+
+		// el hash de bloque coincide
+		if (!Arrays.equals(getHash(), calcularHash())) {
+			System.out.println("Hash bloque inválido");
+			return false;
+		}
+
+		return true;
+	}
+
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(Object o) {
+		if (this == o)
 			return true;
-		if (obj == null || getClass() != obj.getClass())
+		if (o == null || getClass() != o.getClass())
 			return false;
 
-		Bloque bloque = (Bloque) obj;
+		Bloque bloque = (Bloque) o;
 
 		return Arrays.equals(hash, bloque.hash);
 	}
@@ -155,8 +178,8 @@ public class Bloque {
 
 	@Override
 	public String toString() {
-		return "{Hash:" + hash + ", Previo:" + hashBloqueAnterior + ", RaizMerkle:" + raizArbolMerkle + ", Nonce:"
-				+ nonce + ", marcaTemporal:" + new Date(marcaTemporal) + ", Transacciones:" + transacciones.toString()
-				+ "}";
+		return "{Hash:" + Base64.encodeBase64String(hash) + ", Previo:" + Base64.encodeBase64String(hashBloqueAnterior)
+				+ ", RaizMerkle:" + Base64.encodeBase64String(raizArbolMerkle) + ", Nonce:" + nonce + ", Timestamp:"
+				+ new Date(timestamp) + ", Transacciones:" + transacciones.toString() + "}";
 	}
 }

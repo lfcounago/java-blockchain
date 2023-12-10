@@ -2,10 +2,11 @@ package com.lfcounago.javablockchain.commons.estructuras;
 
 import com.google.common.primitives.Longs;
 
-import com.lfcounago.javablockchain.commons.utilidades.UtilidadesFirma;
-
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
+
+import com.lfcounago.javablockchain.commons.utilidades.UtilidadesFirma;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -30,7 +31,7 @@ public class Transaccion {
 
     // Marca temporal de la creación de la transacción en milisegundos desde el
     // 1/1/1970
-    private long marcaTemporal;
+    private long timestamp;
 
     public Transaccion() {
     }
@@ -40,7 +41,7 @@ public class Transaccion {
         this.destinatario = receptor;
         this.cantidad = cantidad;
         this.firma = firma;
-        this.marcaTemporal = System.currentTimeMillis();
+        this.timestamp = System.currentTimeMillis();
         this.hash = calcularHashTransaccion();
     }
 
@@ -84,12 +85,12 @@ public class Transaccion {
         this.firma = firma;
     }
 
-    public long getMarcaTemporal() {
-        return marcaTemporal;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public void setMarcaTemporal(long marcaTemporal) {
-        this.marcaTemporal = marcaTemporal;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     /**
@@ -99,12 +100,10 @@ public class Transaccion {
      * @return byte[] Array de bytes representando el contenido de la transaccion
      */
     public byte[] getContenidoTransaccion() {
-        // Adds all the elements of the given arrays into a new array.
         byte[] contenido = ArrayUtils.addAll(String.valueOf(cantidad).getBytes());
         contenido = ArrayUtils.addAll(contenido, emisor);
         contenido = ArrayUtils.addAll(contenido, destinatario);
-        contenido = ArrayUtils.addAll(contenido, firma);
-        contenido = ArrayUtils.addAll(contenido, Longs.toByteArray(marcaTemporal));
+        contenido = ArrayUtils.addAll(contenido, Longs.toByteArray(timestamp));
         return contenido;
     }
 
@@ -124,14 +123,17 @@ public class Transaccion {
      * @return true si tiene un hash válido y la firma es válida
      */
     public boolean esValida() {
+
         // verificar hash
         if (!Arrays.equals(getHash(), calcularHashTransaccion())) {
+            System.out.println("Hash de transacción inválido");
             return false;
         }
 
         // verificar firma
         try {
             if (!UtilidadesFirma.validarFirma(getContenidoTransaccion(), getFirma(), emisor)) {
+                System.out.println("Firma de transacción inválida");
                 return false;
             }
         } catch (Exception e) {
@@ -142,17 +144,15 @@ public class Transaccion {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public boolean equals(Object o) {
+        if (this == o)
             return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (o == null || getClass() != o.getClass())
             return false;
-        }
 
-        Transaccion tran = (Transaccion) obj;
+        Transaccion tr = (Transaccion) o;
 
-        return Arrays.equals(hash, tran.hash);
+        return Arrays.equals(hash, tr.hash);
     }
 
     @Override
@@ -162,8 +162,9 @@ public class Transaccion {
 
     @Override
     public String toString() {
-        return "{" + hash + ", " + emisor + ", " + destinatario + ", " + cantidad + ", " + firma + ", "
-                + new Date(marcaTemporal) + "}";
+        return "{" + Base64.encodeBase64String(hash) + ", " + Base64.encodeBase64String(emisor) + ", "
+                + Base64.encodeBase64String(destinatario) + ", " + cantidad + ", " + Base64.encodeBase64String(firma)
+                + ", " + new Date(timestamp) + "}";
     }
 
 }

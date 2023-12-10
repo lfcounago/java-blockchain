@@ -2,18 +2,27 @@ package com.lfcounago.javablockchain.commons.estructuras;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class PoolTransacciones {
 
     private Set<Transaccion> pool = new HashSet<>();
 
+    public PoolTransacciones() {
+
+    }
+
+    public PoolTransacciones(List<Transaccion> transacciones) {
+        this.pool.addAll(transacciones);
+    }
+
     /**
      * Añadir una transaccion al pool
      * 
      * @return true si la transaccion es válida y es añadida al pool
      */
-    public synchronized boolean add(Transaccion transaccion) {
+    public synchronized boolean añadirTransaccion(Transaccion transaccion) {
         if (transaccion.esValida()) {
             pool.add(transaccion);
             return true;
@@ -24,7 +33,7 @@ public class PoolTransacciones {
     /**
      * Eliminar una transaccion del pool
      */
-    public void eliminar(Transaccion transaccion) {
+    public void eliminarTransaccion(Transaccion transaccion) {
         pool.remove(transaccion);
     }
 
