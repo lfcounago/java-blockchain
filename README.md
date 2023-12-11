@@ -10,7 +10,7 @@ The blockchain developed is in the style of the Bitcoin network, its objective i
 
 This diagram shows the process of a transaction from its sending to its incorporation into the chain.
 
-![Developed diagram](pictures\developedDiagram.png)
+![Developed diagram](./pictures/developedDiagram.png)
 
 1. El usuario envía una transacción a un nodo de la red.
 2. El nodo añade la transacción a su pool de transacciones.
@@ -28,3 +28,7 @@ To run this project, you will need to have the following installed:
 - Java 17
 - Maven
 
+## Installation
+
+1. Clone this repository on your local machine.
+2. Navigate to the root directory of the project.
