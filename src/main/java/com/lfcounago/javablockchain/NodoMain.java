@@ -4,10 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class JavablockchainApplication {
+public class NodoMain {
 
-	public static void main(String[] args) {
-		SpringApplication.run(JavablockchainApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(NodoMain.class, args);
+    }
 }
