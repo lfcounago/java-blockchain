@@ -1,11 +1,12 @@
 package com.lfcounago.javablockchain.commons.estructuras;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CadenaDeBloques {
 
 	// Lista de bloques en la cadena ordenados por altura
-	private List<Bloque> bloques;
+	private List<Bloque> bloques = new ArrayList<Bloque>();
 
 	public CadenaDeBloques() {
 	}

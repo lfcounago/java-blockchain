@@ -26,6 +26,7 @@ public final class Configuracion {
                 System.out.println("Error al leer el archivo de configuracion: " + e);
             }
         }
+
         return configuracion;
     }
 
@@ -35,8 +36,7 @@ public final class Configuracion {
      * @return La URL del nodo master
      */
     public String getUrlNodoMaster() {
-        // return configuracion.xmlConfiguracion.getString("urlNodoMaster");
-        return "http://localhost:8080";
+        return configuracion.xmlConfiguracion.getString("urlNodoMaster");
     }
 
     /**
@@ -46,8 +46,7 @@ public final class Configuracion {
      * @return El número máximo de transacciones que se pueden incluir en un bloque.
      */
     public int getMaxNumeroTransaccionesEnBloque() {
-        // return configuracion.xmlConfiguracion.getInt("maxTransaccionesPorBloque");
-        return 10;
+        return configuracion.xmlConfiguracion.getInt("maxTransaccionesPorBloque");
     }
 
     /**
@@ -57,7 +56,6 @@ public final class Configuracion {
      * @return La dificultad de la prueba de trabajo requerida para minar un bloque.
      */
     public int getDificultad() {
-        // return configuracion.xmlConfiguracion.getInt("dificultad");
-        return 0;
+        return configuracion.xmlConfiguracion.getInt("dificultad");
     }
 }

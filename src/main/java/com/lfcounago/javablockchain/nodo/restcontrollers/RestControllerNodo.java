@@ -31,8 +31,9 @@ public class RestControllerNodo {
      *
      * @return Un conjunto de URLs de los nodos vecinos en formato JSON.
      */
-    @RequestMapping()
+    @RequestMapping(method = RequestMethod.GET)
     Set<URL> getNodosVecinos() {
+        System.out.println("Request: getNodosVecinos");
         return servicioNodo.getNodosVecinos();
     }
 
@@ -43,14 +44,10 @@ public class RestControllerNodo {
      * @param response La respuesta HTTP.
      */
     @RequestMapping(method = RequestMethod.POST)
-    void altaNodo(@RequestBody String urlNodo, HttpServletResponse response) {
-        System.out.println("Alta nodo " + urlNodo);
-        try {
-            servicioNodo.altaNodo(new URL(urlNodo));
-            response.setStatus(HttpServletResponse.SC_OK);
-        } catch (MalformedURLException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        }
+    void altaNodo(@RequestBody URL urlNodo, HttpServletResponse response) {
+        System.out.println("Request: altaNodo " + urlNodo);
+        servicioNodo.altaNodo(urlNodo);
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     /**
@@ -60,14 +57,10 @@ public class RestControllerNodo {
      * @param response La respuesta HTTP.
      */
     @RequestMapping(method = RequestMethod.DELETE)
-    void bajaNodo(@RequestBody String urlNodo, HttpServletResponse response) {
-        System.out.println("Baja nodo " + urlNodo);
-        try {
-            servicioNodo.bajaNodo(new URL(urlNodo));
-            response.setStatus(HttpServletResponse.SC_OK);
-        } catch (MalformedURLException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        }
+    void bajaNodo(@RequestBody URL urlNodo, HttpServletResponse response) {
+        System.out.println("Request: bajaNodo " + urlNodo);
+        servicioNodo.bajaNodo(urlNodo);
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     /**
@@ -76,8 +69,9 @@ public class RestControllerNodo {
      * @param request La petición HTTP.
      * @return La IP pública del cliente.
      */
-    @RequestMapping(path = "ip")
+    @RequestMapping(path = "ip", method = RequestMethod.GET)
     String getIpPublica(HttpServletRequest request) {
+        System.out.println("Request: getIpPublica");
         return request.getRemoteAddr();
     }
 

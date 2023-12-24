@@ -33,8 +33,9 @@ public class RestControllerBloques {
      *
      * @return La cadena de bloques.
      */
-    @RequestMapping
+    @RequestMapping(method = RequestMethod.GET)
     CadenaDeBloques getCadenaDeBloques() {
+        System.out.println("Request: getCadenaDeBloques");
         return servicioBloques.getCadenaDeBloques();
     }
 
@@ -50,7 +51,7 @@ public class RestControllerBloques {
     @RequestMapping(method = RequestMethod.POST)
     void añadirBloque(@RequestBody Bloque bloque, @RequestParam(required = false) Boolean propagar,
             HttpServletResponse response) {
-        System.out.println("Añadir bloque " + Base64.encodeBase64String(bloque.getHash()));
+        System.out.println("Request: Añadir bloque " + Base64.encodeBase64String(bloque.getHash()));
         boolean exito = servicioBloques.añadirBloque(bloque);
 
         if (exito) {

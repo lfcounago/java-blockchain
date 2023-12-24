@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lfcounago.javablockchain.commons.estructuras.PoolTransacciones;
@@ -33,8 +34,10 @@ public class RestControllerTransacciones {
      *
      * @return El pool de transacciones en formato JSON.
      */
-    @RequestMapping
+    @RequestMapping(method = RequestMethod.GET)
+    @ResponseBody
     PoolTransacciones getPoolTransacciones() {
+        System.out.println("Request: getPoolTransacciones");
         return servicioTransacciones.getPoolTransacciones();
     }
 
@@ -50,7 +53,7 @@ public class RestControllerTransacciones {
     @RequestMapping(method = RequestMethod.POST)
     void añadirTransaccion(@RequestBody Transaccion transaccion, @RequestParam(required = false) Boolean propagar,
             HttpServletResponse response) {
-        System.out.println("Añadir transaccion " + Base64.encodeBase64String(transaccion.getHash()));
+        System.out.println("Request: Añadir transaccion " + Base64.encodeBase64String(transaccion.getHash()));
         boolean exito = servicioTransacciones.añadirTransaccion(transaccion);
 
         if (exito) {

@@ -60,7 +60,7 @@ public class ServiceBloques {
      * @param restTemplate El RestTemplate a usar para la petición HTTP.
      */
     public void obtenerCadenaDeBloques(URL urlNodo, RestTemplate restTemplate) {
-        CadenaDeBloques cadena = restTemplate.getForObject(urlNodo + "/cadena", CadenaDeBloques.class);
+        CadenaDeBloques cadena = restTemplate.getForObject(urlNodo + "/bloque", CadenaDeBloques.class);
         this.cadenaDeBloques = cadena;
         System.out.println("Obtenida cadena de bloques de nodo " + urlNodo);
     }
@@ -77,7 +77,7 @@ public class ServiceBloques {
      * @return true si el bloque es válido, false en caso contrario.
      */
     private boolean validarBloque(Bloque bloque) {
-        // comprobar que el bloque tiene un formato válido
+        // comprobar que el bloque tiene un formato v�lido
         if (!bloque.esValido()) {
             return false;
         }
