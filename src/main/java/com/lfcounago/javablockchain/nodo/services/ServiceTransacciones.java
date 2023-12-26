@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.lfcounago.javablockchain.commons.estructuras.PoolTransacciones;
+import com.lfcounago.javablockchain.commons.estructuras.RegistroSaldos;
 import com.lfcounago.javablockchain.commons.estructuras.Transaccion;
 
 @Service
@@ -31,14 +32,13 @@ public class ServiceTransacciones {
     }
 
     /**
-     * Añade una transacción al pool de transacciones si es válida.
+     * Añade una transacción al pool de transacciones de manera sincronizada.
      *
      * @param transaccion La transacción que se va a añadir al pool.
-     * @return true si la transacción es válida y se ha añadido al pool, false en
-     *         caso contrario.
+     * @throws Exception Si ocurre un error al añadir la transacción al pool.
      */
-    public synchronized boolean añadirTransaccion(Transaccion transaccion) {
-        return poolTransacciones.añadirTransaccion(transaccion);
+    public synchronized void añadirTransaccion(Transaccion transaccion) throws Exception {
+        poolTransacciones.añadirTransaccion(transaccion);
     }
 
     /**
@@ -63,15 +63,18 @@ public class ServiceTransacciones {
     }
 
     /**
-     * Descarga el pool de transacciones desde otro nodo.
+     * Obtiene el pool de transacciones desde un nodo remoto utilizando un objeto
+     * RestTemplate.
      *
-     * @param urlNodo      Nodo del que se van a obtener las transacciones.
-     * @param restTemplate RestTemplate a usar para la petición HTTP.
+     * @param urlNodo      La URL del nodo remoto del cual se va a obtener el pool
+     *                     de transacciones.
+     * @param restTemplate El objeto RestTemplate utilizado para realizar la
+     *                     solicitud HTTP.
      */
     public void obtenerPoolTransacciones(URL urlNodo, RestTemplate restTemplate) {
         PoolTransacciones poolTransacciones = restTemplate.getForObject(urlNodo + "/transaccion",
                 PoolTransacciones.class);
         this.poolTransacciones = poolTransacciones;
-        System.out.println("Obtenido pool de transacciones de nodo " + urlNodo);
+        System.out.println("Obtenido pool de transacciones de nodo " + urlNodo + ".\n");
     }
 }

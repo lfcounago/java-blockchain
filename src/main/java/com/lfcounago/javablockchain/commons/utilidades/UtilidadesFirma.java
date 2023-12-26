@@ -51,34 +51,32 @@ public class UtilidadesFirma {
     }
 
     /**
-     * Valida una firma para unos datos y clave pública dados.
+     * Valida una firma digital utilizando una clave pública y la información
+     * proporcionada.
      *
-     * @param datosVerificar Los datos que se deben verificar.
-     * @param firmaVerificar La firma que se debe verificar.
-     * @param clavePublica   La clave pública que se debe usar para la verificación.
-     * @return true si la firma es válida para los datos y clave pública dados,
-     *         false en caso contrario.
-     * @throws InvalidKeySpecException  Si la clave pública proporcionada no es
-     *                                  válida.
-     * @throws NoSuchProviderException  Si el proveedor de seguridad "SUN" no está
-     *                                  disponible.
-     * @throws NoSuchAlgorithmException Si el algoritmo "DSA" no está disponible.
-     * @throws SignatureException       Si hay un error al verificar la firma.
-     * @throws InvalidKeyException      Si la clave pública proporcionada no es
-     *                                  válida.
+     * @param info         Los datos sobre los cuales se realizó la firma.
+     * @param firma        La firma digital a validar.
+     * @param clavePublica La clave pública utilizada para la verificación de la
+     *                     firma.
+     * @return true si la firma es válida, false de lo contrario o si hay algún
+     *         error durante el proceso de verificación.
      */
-    public static boolean validarFirma(byte[] datosVerificar, byte[] firmaVerificar, byte[] clavePublica)
-            throws InvalidKeySpecException,
-            NoSuchProviderException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
-        // crear un objeto PublicKey con la clave pública dada
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(clavePublica);
-        PublicKey publicKeyObj = keyFactory.generatePublic(keySpec);
+    public static boolean validarFirma(byte[] info, byte[] firma, byte[] clavePublica) {
 
-        // validar firma
-        Signature sig = getInstanciaSignature();
-        sig.initVerify(publicKeyObj);
-        sig.update(datosVerificar);
-        return sig.verify(firmaVerificar);
+        // crear un objeto PublicKey con la clave publica dada
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(clavePublica);
+        PublicKey publicKeyObj;
+        try {
+            publicKeyObj = keyFactory.generatePublic(keySpec);
+
+            // validar firma
+            Signature sig = getInstanciaSignature();
+            sig.initVerify(publicKeyObj);
+            sig.update(info);
+            return sig.verify(firma);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**

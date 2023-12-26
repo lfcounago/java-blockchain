@@ -58,4 +58,32 @@ public final class Configuracion {
     public int getDificultad() {
         return configuracion.xmlConfiguracion.getInt("dificultad");
     }
+
+    /**
+     * Obtiene el valor booleano que indica si se debe minar según la configuración.
+     *
+     * @return true si se debe minar, false de lo contrario.
+     */
+    public boolean getMinar() {
+        return configuracion.xmlConfiguracion.getBoolean("minar");
+    }
+
+    /**
+     * Obtiene la dirección de la billetera (coinbase) según la configuración.
+     *
+     * @return La dirección de la billetera (coinbase).
+     */
+    public String getCoinbase() {
+        return configuracion.xmlConfiguracion.getString("coinbase");
+    }
+
+    /**
+     * Obtiene la cantidad de criptomoneda a minar según la configuración.
+     *
+     * @return La cantidad de criptomoneda a minar.
+     */
+    public double getCantidadCoinbase() {
+        return configuracion.xmlConfiguracion.getDouble("cantidadCoinbase");
+    }
+
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lfcounago.javablockchain.commons.estructuras.RegistroSaldos;
 import com.lfcounago.javablockchain.commons.estructuras.PoolTransacciones;
 import com.lfcounago.javablockchain.commons.estructuras.Transaccion;
 import com.lfcounago.javablockchain.nodo.services.ServiceNodo;
@@ -37,34 +38,39 @@ public class RestControllerTransacciones {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     PoolTransacciones getPoolTransacciones() {
-        System.out.println("Request: getPoolTransacciones");
+        System.out.println("PETICION POOL DE TRANSACCIONES\n");
         return servicioTransacciones.getPoolTransacciones();
     }
 
     /**
-     * Añade una transacción al pool de transacciones.
-     * Si el parámetro 'propagar' es true, emite una petición POST a los nodos
-     * vecinos para propagar la transacción.
+     * Maneja las solicitudes HTTP POST para añadir una transacción al pool de
+     * transacciones del sistema blockchain.
      *
-     * @param transaccion La transacción que se va a añadir al pool.
-     * @param propagar    Si es true, propaga la transacción a los nodos vecinos.
-     * @param response    La respuesta HTTP.
+     * @param transaccion La transacción que se va a añadir, proporcionada en el
+     *                    cuerpo de la solicitud.
+     * @param propagar    Indica si se debe propagar la transacción a nodos vecinos
+     *                    (opcional).
+     * @param response    La respuesta HTTP que se enviará al cliente.
      */
     @RequestMapping(method = RequestMethod.POST)
     void añadirTransaccion(@RequestBody Transaccion transaccion, @RequestParam(required = false) Boolean propagar,
             HttpServletResponse response) {
-        System.out.println("Request: Añadir transaccion " + Base64.encodeBase64String(transaccion.getHash()));
-        boolean exito = servicioTransacciones.añadirTransaccion(transaccion);
+        System.out.println("NUEVA TRANSACCION RECIBIDA:");
+        System.out.println(transaccion);
+        System.out.println("\n");
+        try {
+            // Comprobar si la transacción es válida
+            servicioTransacciones.añadirTransaccion(transaccion);
 
-        if (exito) {
-            System.out.println("Transaccion validada y añadida.");
+            System.out.println("Transacción añadida al pool.\n");
             response.setStatus(HttpServletResponse.SC_ACCEPTED);
 
             if (propagar != null && propagar) {
                 servicioNodo.emitirPeticionPostNodosVecinos("transaccion", transaccion);
+                System.out.println("Transacción propagada.\n");
             }
-        } else {
-            System.out.println("Transaccion invalida y no añadida.");
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
             response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
         }
     }

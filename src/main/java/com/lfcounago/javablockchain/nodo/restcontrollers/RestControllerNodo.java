@@ -1,6 +1,5 @@
 package com.lfcounago.javablockchain.nodo.restcontrollers;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Set;
 
@@ -10,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lfcounago.javablockchain.Configuracion;
+import com.lfcounago.javablockchain.nodo.services.ServiceMinado;
 import com.lfcounago.javablockchain.nodo.services.ServiceNodo;
 
 import jakarta.servlet.http.HttpServletRequest;

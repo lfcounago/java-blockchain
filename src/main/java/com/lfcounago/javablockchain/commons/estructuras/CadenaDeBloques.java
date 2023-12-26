@@ -2,33 +2,39 @@ package com.lfcounago.javablockchain.commons.estructuras;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 public class CadenaDeBloques {
 
 	// Lista de bloques en la cadena ordenados por altura
 	private List<Bloque> bloques = new ArrayList<Bloque>();
+	// Saldos actuales de las cuentas
+	private RegistroSaldos saldos = new RegistroSaldos();
 
 	public CadenaDeBloques() {
 	}
 
-	public CadenaDeBloques(List<Bloque> bloques) {
-		this.bloques = bloques;
+	public CadenaDeBloques(CadenaDeBloques cadena) throws Exception {
+		this.setBloques(cadena.getBloques());
 	}
 
 	public List<Bloque> getBloques() {
 		return bloques;
 	}
 
-	public void setBloques(List<Bloque> bloques) {
-		this.bloques = bloques;
+	public void setBloques(List<Bloque> bloques) throws Exception {
+		this.bloques = new ArrayList<Bloque>();
+		for (Bloque bloque : bloques) {
+			this.añadirBloque(bloque);
+		}
 	}
 
 	public boolean estaVacia() {
 		return this.bloques == null || this.bloques.isEmpty();
 	}
 
-	public int getNumeroBloques() {
-		return (estaVacia() ? 0 : this.bloques.size());
+	public RegistroSaldos getSaldos() {
+		return this.saldos;
 	}
 
 	/**
@@ -44,13 +50,30 @@ public class CadenaDeBloques {
 		return this.bloques.get(this.bloques.size() - 1);
 	}
 
+	public int getNumeroBloques() {
+		return (estaVacia() ? 0 : this.bloques.size());
+	}
+
 	/**
 	 * Este método se utiliza para añadir un bloque a la cadena de bloques.
 	 *
 	 * @param bloque El bloque que se va a añadir a la cadena de bloques.
 	 */
-	public void añadirBloque(Bloque bloque) {
+	public void añadirBloque(Bloque bloque) throws Exception {
+
+		// iteramos y procesamos las transacciones. Si todo es correcto lo añadimos a la
+		// cadena
+		Iterator<Transaccion> itr = bloque.getTransacciones().iterator();
+
+		while (itr.hasNext()) {
+			Transaccion transaccion = (Transaccion) itr.next();
+			// actualizar saldos
+			saldos.liquidarTransaccion(transaccion);
+		}
+
 		this.bloques.add(bloque);
+
+		System.out.println(saldos.toString() + "\n");
 	}
 
 	/**

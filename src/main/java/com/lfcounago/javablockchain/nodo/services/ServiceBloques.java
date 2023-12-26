@@ -2,6 +2,7 @@ package com.lfcounago.javablockchain.nodo.services;
 
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.lfcounago.javablockchain.commons.estructuras.Bloque;
 import com.lfcounago.javablockchain.commons.estructuras.CadenaDeBloques;
+import com.lfcounago.javablockchain.commons.estructuras.RegistroSaldos;
+import com.lfcounago.javablockchain.commons.estructuras.Transaccion;
 import com.lfcounago.javablockchain.Configuracion;
 
 @Service
@@ -33,82 +36,89 @@ public class ServiceBloques {
     }
 
     /**
-     * Añade un bloque a la cadena de bloques si es válido.
-     * Si el bloque es válido, también elimina las transacciones incluidas en el
-     * bloque del pool de transacciones.
+     * Añade un bloque a la cadena de bloques de manera sincronizada, validando el
+     * bloque antes de agregarlo.
      *
      * @param bloque El bloque que se va a añadir a la cadena de bloques.
-     * @return true si el bloque es válido y se ha añadido a la cadena de bloques,
-     *         false en caso contrario.
+     * @throws Exception Si el bloque no es válido, se lanza una excepción con el
+     *                   mensaje "Bloque inválido".
      */
-    public synchronized boolean añadirBloque(Bloque bloque) {
+    public synchronized void añadirBloque(Bloque bloque) throws Exception {
         if (validarBloque(bloque)) {
             this.cadenaDeBloques.añadirBloque(bloque);
 
-            // eliminar las transacciones incluidas en el bloque del pool de transacciones
-            bloque.getTransacciones().forEach(servicioTransacciones::eliminarTransaccion);
-            return true;
+            // Eliminar transacciones del pool excepto la primera transacción que es la
+            // coinbase
+            bloque.getTransacciones().subList(1, bloque.getTransacciones().size())
+                    .forEach(servicioTransacciones::eliminarTransaccion);
+
+            System.out.println("Bloque añadido a la cadena de bloques.\n");
+        } else {
+            throw new Exception("Bloque inválido");
         }
-        return false;
     }
 
     /**
-     * Descarga la cadena de bloques desde otro nodo.
+     * Obtiene la cadena de bloques desde un nodo remoto utilizando un objeto
+     * RestTemplate.
      *
-     * @param urlNodo      La URL del nodo del que se va a descargar la cadena de
-     *                     bloques.
-     * @param restTemplate El RestTemplate a usar para la petición HTTP.
+     * @param urlNodo      La URL del nodo remoto del cual se va a obtener la cadena
+     *                     de bloques.
+     * @param restTemplate El objeto RestTemplate utilizado para realizar la
+     *                     solicitud HTTP.
      */
     public void obtenerCadenaDeBloques(URL urlNodo, RestTemplate restTemplate) {
         CadenaDeBloques cadena = restTemplate.getForObject(urlNodo + "/bloque", CadenaDeBloques.class);
-        this.cadenaDeBloques = cadena;
-        System.out.println("Obtenida cadena de bloques de nodo " + urlNodo);
+        System.out.println("Obtenida cadena de bloques de nodo " + urlNodo + ".\n");
+        try {
+            this.cadenaDeBloques = new CadenaDeBloques(cadena);
+        } catch (Exception e) {
+            System.out.println("Cadena de bloques inválida");
+        }
     }
 
     /**
-     * Valida un bloque que se va a añadir a la cadena de bloques.
-     * Comprueba que el bloque tiene un formato válido, que el hash del bloque
-     * anterior hace referencia al último bloque en la cadena,
-     * que el número de transacciones en el bloque no supera el límite, que todas
-     * las transacciones en el bloque están en el pool de transacciones,
-     * y que la dificultad del bloque es la correcta.
+     * Valida un bloque verificando diversos aspectos, como el formato, el hash del
+     * bloque anterior, el número de transacciones,
+     * la presencia de transacciones en el pool, y la dificultad del bloque.
      *
      * @param bloque El bloque que se va a validar.
-     * @return true si el bloque es válido, false en caso contrario.
+     * @return true si el bloque es válido, false de lo contrario.
      */
     private boolean validarBloque(Bloque bloque) {
-        // comprobar que el bloque tiene un formato v�lido
+        // Comprobar que el bloque tiene un formato válido
         if (!bloque.esValido()) {
             return false;
         }
 
-        // el hash de bloque anterior hace referencia al ultimo bloque en mi cadena
+        // El hash del bloque anterior hace referencia al último bloque en mi cadena
         if (!cadenaDeBloques.estaVacia()) {
             byte[] hashUltimoBloque = cadenaDeBloques.getUltimoBloque().getHash();
             if (!Arrays.equals(bloque.getHashBloqueAnterior(), hashUltimoBloque)) {
-                System.out.println("Bloque anterior invalido");
+                System.out.println("Hash bloque anterior no coincide.");
                 return false;
             }
         } else {
             if (bloque.getHashBloqueAnterior() != null) {
-                System.out.println("Bloque anterior invalido");
+                System.out.println("Hash bloque anterior inválido. Debería ser null.");
                 return false;
             }
         }
 
-        // max. numero de transacciones en un bloque
-        if (bloque.getTransacciones().size() > Configuracion.getInstancia().getMaxNumeroTransaccionesEnBloque()) {
-            System.out.println("Numero de transacciones supera el limite.");
+        // Máximo número de transacciones en un bloque
+        if (bloque.getTransacciones().size() > Configuracion.getInstancia().getMaxNumeroTransaccionesEnBloque() + 1) {
+            System.out.println("El número de transacciones supera el límite.");
             return false;
         }
 
-        // verificar que todas las transacciones estaban en mi pool
-        if (!servicioTransacciones.contieneTransacciones(bloque.getTransacciones())) {
-            System.out.println("Algunas transacciones no en pool");
+        // Verificar que todas las transacciones estaban en mi pool
+        if (!servicioTransacciones
+                .contieneTransacciones(bloque.getTransacciones().subList(1, bloque.getTransacciones().size()))) {
+            System.out.println("Algunas transacciones no están en el pool");
             return false;
         }
 
-        // la dificultad coincide
+        // La dificultad coincide
         if (bloque.getNumeroDeCerosHash() < Configuracion.getInstancia().getDificultad()) {
             System.out.println("Bloque con dificultad inválida");
             return false;
@@ -116,4 +126,5 @@ public class ServiceBloques {
 
         return true;
     }
+
 }

@@ -2,9 +2,17 @@ package com.lfcounago.javablockchain.nodo.services;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import java.security.KeyPair;
+
+import org.apache.commons.codec.binary.Base64;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
@@ -13,6 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.lfcounago.javablockchain.Configuracion;
+import com.lfcounago.javablockchain.commons.estructuras.Bloque;
+import com.lfcounago.javablockchain.commons.estructuras.Transaccion;
+import com.lfcounago.javablockchain.commons.utilidades.UtilidadesFirma;
 
 import jakarta.annotation.PreDestroy;
 
@@ -29,6 +40,7 @@ public class ServiceNodo implements ApplicationListener<WebServerInitializedEven
     private Set<URL> nodosVecinos = new HashSet<>();
 
     private RestTemplate restTemplate = new RestTemplate();
+    public boolean inicializado = false;
 
     @Autowired
     public ServiceNodo(ServiceBloques servicioCadenaDeBloques, ServiceTransacciones servicioTransacciones) {
@@ -37,12 +49,13 @@ public class ServiceNodo implements ApplicationListener<WebServerInitializedEven
     }
 
     /**
-     * Método que se ejecuta al iniciar la aplicación.
-     * Obtiene la lista de nodos en la red, la cadena de bloques, las transacciones
-     * en el pool y registra el nodo en la red.
+     * Maneja el evento de inicialización del servidor web y realiza las operaciones
+     * necesarias para configurar
+     * y sincronizar el nodo en la red blockchain. Se ejecuta automáticamente al
+     * iniciar la aplicación.
      *
-     * @param webServerInitializedEvent Evento que se dispara cuando el servidor web
-     *                                  se ha inicializado.
+     * @param webServerInitializedEvent El evento de inicialización del servidor
+     *                                  web.
      */
     @Override
     public void onApplicationEvent(WebServerInitializedEvent webServerInitializedEvent) {
@@ -58,6 +71,13 @@ public class ServiceNodo implements ApplicationListener<WebServerInitializedEven
         // descargar cadena de bloques y transacciones en pool si no soy nodo master
         if (miUrlNodo.equals(urlNodoMaster)) {
             System.out.println("Ejecutando nodo master");
+            // crear bloque genesis
+            /*
+             * try { Bloque genesis = this.getBloqueGenesis();
+             * //servicioBloques.añadirBloque(genesis); } catch (Exception e) {
+             * System.out.println("No se pudo añadir el bloque génesis"); }
+             */
+
         } else {
             nodosVecinos.add(urlNodoMaster);
 
@@ -69,6 +89,8 @@ public class ServiceNodo implements ApplicationListener<WebServerInitializedEven
             // dar de alta mi nodo en el resto de nodos en la red
             emitirPeticionPostNodosVecinos("nodo", miUrlNodo);
         }
+
+        inicializado = true;
     }
 
     /**
@@ -189,6 +211,40 @@ public class ServiceNodo implements ApplicationListener<WebServerInitializedEven
             System.out.println("Invalida URL Nodo Master:" + e);
             return null;
         }
+    }
+
+    /**
+     * Genera y devuelve un bloque génesis con una única transacción coinbase. La
+     * transacción coinbase
+     * es generada a partir de la configuración del sistema y se establece el
+     * timestamp y el hash correspondiente.
+     *
+     * @return El bloque génesis generado.
+     * @throws Exception Si hay un error al generar el bloque génesis.
+     */
+    private Bloque getBloqueGenesis() throws Exception {
+        // Clave pública de la transacción coinbase en formato Base64
+        String coinbasePublicKey = Configuracion.getInstancia().getCoinbase();
+
+        // Crear una transacción coinbase
+        Transaccion txCoinbase = new Transaccion(Base64.decodeBase64(coinbasePublicKey));
+        txCoinbase.setTimestamp(System.currentTimeMillis());
+        txCoinbase.setHash(txCoinbase.calcularHashTransaccion());
+
+        // Crear un bloque génesis con la transacción coinbase
+        List<Transaccion> transacciones = new ArrayList<>(Arrays.asList(txCoinbase));
+        Bloque bloqueGenesis = new Bloque(null, transacciones, 0);
+
+        return bloqueGenesis;
+    }
+
+    /**
+     * Devuelve la URL del nodo actual.
+     *
+     * @return URL del nodo.
+     */
+    public URL getMyURL() {
+        return this.miUrlNodo;
     }
 
 }
